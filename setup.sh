@@ -134,6 +134,7 @@ dockutil --add /Applications/Microsoft\ Outlook.app --no-restart
 dockutil --add /Applications/Microsoft\ Teams.app --no-restart
 dockutil --add /Applications/Visual\ Studio\ Code.app --no-restart
 dockutil --add /Applications/ChatGPT.app --no-restart
+dockutil --add /Applications/Notes.app --no-restart
 
 # Restart the Dock to apply changes
 killall Dock
