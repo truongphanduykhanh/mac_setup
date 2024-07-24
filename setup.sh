@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+
+###############################################################################
+# Homebrew and applications setup
+###############################################################################
 # Ensure Homebrew is installed
 if ! command -v brew &> /dev/null; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -35,6 +39,40 @@ for app in "${apps[@]}"; do
   brew install --cask "$app"
 done
 
+
+###############################################################################
+# Set up Dock items
+###############################################################################
+# Install dockutil if not already installed
+if ! command -v dockutil &> /dev/null; then
+  brew install dockutil
+fi
+
+# Clear existing Dock items
+dockutil --remove all --no-restart
+
+# Add default items to the Dock
+dockutil --add /System/Applications/System\ Settings.app --no-restart
+dockutil --add /System/Applications/Utilities/Terminal.app --no-restart
+
+# Add separator (vertical bar) 
+dockutil --add '' --type spacer --section apps --no-restart
+
+# Add specified applications to the Dock
+dockutil --add /Applications/Google\ Chrome.app --no-restart
+dockutil --add /Applications/Microsoft\ Outlook.app --no-restart
+dockutil --add /Applications/Microsoft\ Teams.app --no-restart
+dockutil --add /Applications/Visual\ Studio\ Code.app --no-restart
+dockutil --add /Applications/ChatGPT.app --no-restart
+dockutil --add /Applications/Notes.app --no-restart
+
+# Restart the Dock to apply changes
+killall Dock
+
+
+###############################################################################
+# Anaconda Setup
+###############################################################################
 # Function to set up Anaconda and initialize Conda
 setup_anaconda_conda() {
   local anaconda_path="/opt/homebrew/anaconda3/bin"
@@ -85,6 +123,10 @@ setup_anaconda_conda() {
 # Call the function to set up Anaconda and initialize Conda
 setup_anaconda_conda
 
+
+###############################################################################
+# VS Code Setup
+###############################################################################
 # List of VS Code extensions to install
 vscode_extensions=(
   ms-python.python
@@ -113,30 +155,27 @@ install_vscode_extensions() {
 # Call the function to install VS Code extensions
 install_vscode_extensions
 
-# Install dockutil if not already installed
-if ! command -v dockutil &> /dev/null; then
-  brew install dockutil
-fi
+# Function to configure VS Code settings
+configure_vscode_settings() {
+  local settings_path="$HOME/Library/Application Support/Code/User/settings.json"
+  
+  # Create settings.json file if it does not exist
+  if [ ! -f "$settings_path" ]; then
+    echo "{}" > "$settings_path"
+  fi
 
-# Clear existing Dock items
-dockutil --remove all --no-restart
+  # Add rulers to settings.json
+  echo "Updating VS Code settings to include rulers..."
+  jq '.["editor.rulers"] = [79, 100]' "$settings_path" > tmp.json && mv tmp.json "$settings_path"
 
-# Add default items to the Dock
-dockutil --add /System/Applications/System\ Settings.app --no-restart
-dockutil --add /System/Applications/Utilities/Terminal.app --no-restart
+  echo "VS Code settings updated with rulers at 79 and 100 columns."
+}
 
-# Add separator (vertical bar) 
-dockutil --add '' --type spacer --section apps --no-restart
+# Call the function to configure VS Code settings
+configure_vscode_settings
 
-# Add specified applications to the Dock
-dockutil --add /Applications/Google\ Chrome.app --no-restart
-dockutil --add /Applications/Microsoft\ Outlook.app --no-restart
-dockutil --add /Applications/Microsoft\ Teams.app --no-restart
-dockutil --add /Applications/Visual\ Studio\ Code.app --no-restart
-dockutil --add /Applications/ChatGPT.app --no-restart
-dockutil --add /Applications/Notes.app --no-restart
 
-# Restart the Dock to apply changes
-killall Dock
-
+###############################################################################
+# Complete
+###############################################################################
 echo "Setup complete!"
